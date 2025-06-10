@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../core/utils/validation_helper.dart';
 import '../widgets/loading_button.dart';
+import '../../domain/services/authentication_service.dart';
+import '../../core/services/firebase_authentication_service.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
-  const ForgotPasswordScreen({Key? key}) : super(key: key);
+  final AuthenticationService? authService;
+
+  const ForgotPasswordScreen({Key? key, this.authService}) : super(key: key);
 
   @override
   State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
@@ -30,13 +34,30 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       _errorMessage = null;
     });
 
-    // Simulação de envio de email
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      // Se o authService for FirebaseAuthenticationService, usa o método específico
+      if (widget.authService != null &&
+          widget.authService is FirebaseAuthenticationService) {
+        final firebaseService =
+            widget.authService as FirebaseAuthenticationService;
+        await firebaseService.sendPasswordResetEmail(
+          _emailController.text.trim(),
+        );
+      } else {
+        // Fallback para simulação (mock service)
+        await Future.delayed(const Duration(seconds: 2));
+      }
 
-    setState(() {
-      _isLoading = false;
-      _emailSent = true;
-    });
+      setState(() {
+        _isLoading = false;
+        _emailSent = true;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = e.toString().replaceFirst('Exception: ', '');
+      });
+    }
   }
 
   @override

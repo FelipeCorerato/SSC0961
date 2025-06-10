@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../../core/utils/validation_helper.dart';
 import '../widgets/loading_button.dart';
 import '../../domain/services/authentication_service.dart';
@@ -182,8 +181,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const ForgotPasswordScreen(),
+                                builder: (context) => ForgotPasswordScreen(
+                                  authService: widget.authService,
+                                ),
                               ),
                             );
                           },
