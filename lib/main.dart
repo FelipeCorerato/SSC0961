@@ -1,13 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:nutripro_flutter/core/services/firebase_authentication_service.dart';
+import 'firebase_options.dart';
 import 'core/navigation/app_routes.dart';
-import 'core/services/mock_authentication_service.dart';
 import 'core/theme/app_theme.dart';
 import 'domain/services/authentication_service.dart';
 import 'presentation/screens/forgot_password_screen.dart';
 import 'presentation/screens/login_screen.dart';
 import 'presentation/screens/register_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Inicializa o Firebase apenas se estiver configurado
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    print('✅ Firebase inicializado com sucesso');
+  } catch (e) {
+    print('⚠️ Firebase não configurado - usando Mock Service: $e');
+  }
+
   runApp(const MyApp());
 }
 
@@ -17,8 +31,12 @@ class MyApp extends StatelessWidget {
   // Este widget é a raiz da sua aplicação
   @override
   Widget build(BuildContext context) {
-    // Cria uma instância do serviço de autenticação mock
-    final AuthenticationService authService = MockAuthenticationService();
+    // Escolha entre Firebase ou Mock Authentication Service
+    // Para usar Firebase Auth (produção), descomente a linha abaixo:
+    final AuthenticationService authService = FirebaseAuthenticationService();
+
+    // Para usar Mock Service (desenvolvimento/teste), use esta linha:
+    // final AuthenticationService authService = MockAuthenticationService();
 
     return MaterialApp(
       title: 'Meu App',
@@ -32,7 +50,8 @@ class MyApp extends StatelessWidget {
         AppRoutes.login: (context) => LoginScreen(authService: authService),
         AppRoutes.register: (context) =>
             RegisterScreen(authService: authService),
-        AppRoutes.forgotPassword: (context) => const ForgotPasswordScreen(),
+        AppRoutes.forgotPassword: (context) =>
+            ForgotPasswordScreen(authService: authService),
         // Não podemos adicionar diretamente MainScreen aqui pois ela precisa de user
         // O redirecionamento será feito diretamente via MaterialPageRoute
       },

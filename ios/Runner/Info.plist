@@ -45,5 +45,20 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Este app usa a rede local para ferramentas de desenvolvimento Flutter.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_dartVmService._tcp</string>
+		<string>_dartVmService._tcp.</string>
+		<string>_dart-vm-service._tcp</string>
+	</array>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+		<key>NSAllowsArbitraryLoads</key>
+		<false/>
+	</dict>
 </dict>
 </plist>
