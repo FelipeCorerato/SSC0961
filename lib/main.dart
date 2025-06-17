@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:nutripro_flutter/core/services/firebase_authentication_service.dart';
 import 'firebase_options.dart';
 import 'core/navigation/app_routes.dart';
@@ -12,14 +14,24 @@ import 'presentation/screens/register_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Inicializa o Firebase apenas se estiver configurado
   try {
+    // Carregar variáveis de ambiente
+    await dotenv.load(fileName: ".env");
+
+    // Inicializar Firebase
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    print('✅ Firebase inicializado com sucesso');
+
+    // Inicializar Gemini com a chave da API do arquivo .env
+    final geminiApiKey = dotenv.env['GEMINI_API_KEY'];
+    if (geminiApiKey != null && geminiApiKey.isNotEmpty) {
+      Gemini.init(apiKey: geminiApiKey);
+    } else {
+      print('Aviso: Chave da API do Gemini não encontrada no arquivo .env');
+    }
   } catch (e) {
-    print('⚠️ Firebase não configurado - usando Mock Service: $e');
+    print('Erro ao inicializar app: $e');
   }
 
   runApp(const MyApp());
