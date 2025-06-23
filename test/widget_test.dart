@@ -7,24 +7,41 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:nutripro_flutter/main.dart';
+import 'package:nutripro_flutter/presentation/screens/login_screen.dart';
+import 'package:nutripro_flutter/core/services/mock_authentication_service.dart';
+import 'package:nutripro_flutter/domain/services/authentication_service.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  group('Testes da Aplicação NutriPro', () {
+    late MockAuthenticationService mockAuthService;
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    setUp(() {
+      mockAuthService = MockAuthenticationService();
+    });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    Widget createLoginScreen() {
+      return MaterialApp(
+        home: LoginScreen(authService: mockAuthService),
+      );
+    }
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    testWidgets('App deve carregar com tela de login', (WidgetTester tester) async {
+      // Build our app and trigger a frame.
+      await tester.pumpWidget(createLoginScreen());
+
+      // Verifica se a tela de login está sendo exibida
+      expect(find.text('Bem-vindo'), findsOneWidget);
+      expect(find.byType(TextFormField), findsNWidgets(2)); // Email e senha
+      expect(find.text('Entrar'), findsOneWidget);
+    });
+
+    testWidgets('Deve mostrar campos de email e senha', (WidgetTester tester) async {
+      await tester.pumpWidget(createLoginScreen());
+
+      // Verifica se os campos de entrada estão presentes
+      expect(find.byType(TextFormField), findsNWidgets(2));
+      expect(find.text('E-mail'), findsOneWidget);
+      expect(find.text('Senha'), findsOneWidget);
+    });
   });
 }
