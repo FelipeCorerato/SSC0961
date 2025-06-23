@@ -2,41 +2,38 @@
 
 Este diretório contém as configurações de CI/CD (Continuous Integration/Continuous Deployment) para o projeto NutriPro Flutter.
 
-## Workflows Disponíveis
+## Workflow Principal
 
-### 1. `test.yml` - Testes Automatizados
+### `ci.yml` - Pipeline Completa
 **Trigger:** Push para `main`/`develop` e Pull Requests
 
-**Executa:**
-- ✅ Verificação de formatação do código (`dart format`)
-- ✅ Análise estática (`flutter analyze`)
-- ✅ Execução de todos os testes (`flutter test`)
-- ✅ Geração de relatório de cobertura (`flutter test --coverage`)
+**Jobs:**
+1. **Testes e Análise** (obrigatório)
+   - ✅ Verificação de formatação do código (`dart format`)
+   - ✅ Análise estática (`flutter analyze`)
+   - ✅ Execução de todos os testes (`flutter test`)
+   - ✅ Geração de relatório de cobertura (`flutter test --coverage`)
 
-### 2. `flutter.yml` - Pipeline Completa (Opcional)
-**Trigger:** Push para `main`/`develop` e Pull Requests
+2. **Build Web** (obrigatório)
+   - ✅ Build para Web (`flutter build web --release`)
+   - ✅ Upload do build como artifact
 
-**Executa:**
-- ✅ Todos os passos do `test.yml`
-- ✅ Build para Android (APK)
-- ✅ Build para iOS (sem assinatura)
-- ✅ Build para Web
-- ✅ Upload de artifacts
+3. **Build Android** (opcional)
+   - ⚠️ Build para Android (`flutter build apk --release`)
+   - ⚠️ Upload do APK como artifact
+   - ⚠️ Pode falhar sem quebrar o pipeline (`continue-on-error: true`)
 
 ## Configuração
 
 ### Pré-requisitos
-- Flutter 3.24.0+
-- Java 17+
+- Flutter (versão estável)
 - GitHub Actions habilitado no repositório
 
-### Variáveis de Ambiente (Opcional)
-Para builds completos, você pode configurar:
-
-```yaml
-# Secrets do GitHub (Settings > Secrets and variables > Actions)
-FIREBASE_SERVICE_ACCOUNT_KEY: # Para builds com Firebase
-GEMINI_API_KEY: # Para testes com Gemini
+### Variáveis de Ambiente
+O workflow cria automaticamente um arquivo `.env` com valores de teste:
+```bash
+GEMINI_API_KEY=test_key
+FIREBASE_API_KEY=test_key
 ```
 
 ## Status Badges
@@ -44,8 +41,7 @@ GEMINI_API_KEY: # Para testes com Gemini
 Adicione estes badges ao seu README.md:
 
 ```markdown
-![Testes](https://github.com/{username}/{repo}/workflows/Testes/badge.svg)
-![Cobertura](https://codecov.io/gh/{username}/{repo}/branch/main/graph/badge.svg)
+![CI/CD](https://github.com/{username}/{repo}/workflows/CI%2FCD%20Pipeline/badge.svg)
 ```
 
 ## Monitoramento
@@ -55,27 +51,40 @@ Adicione estes badges ao seu README.md:
 - Visualize logs detalhados de cada execução
 - Configure notificações para falhas
 
-### Codecov (Opcional)
-- Acesse: `https://codecov.io/gh/{username}/{repo}`
-- Relatórios detalhados de cobertura
-- Histórico de cobertura ao longo do tempo
+### Artifacts
+- **Web Build**: Disponível em `Actions > Workflow runs > Artifacts`
+- **Android APK**: Disponível quando o build Android passar
+
+## Estrutura do Pipeline
+
+```
+┌─────────────────┐
+│   Testes        │ ← Obrigatório
+│   e Análise     │
+└─────────┬───────┘
+          │
+    ┌─────▼─────┐    ┌─────────────────┐
+    │ Build Web │    │ Build Android   │
+    │           │    │   (Opcional)    │
+    └───────────┘    └─────────────────┘
+```
 
 ## Troubleshooting
 
 ### Problemas Comuns
 
-1. **Testes falhando no CI mas passando localmente**
-   - Verifique dependências do sistema
-   - Confirme versão do Flutter
-   - Teste com `flutter clean && flutter pub get`
-
-2. **Build falhando**
-   - Verifique configurações de Android/iOS
+1. **Testes falhando**
+   - Verifique se o arquivo `.env` está sendo criado
    - Confirme que todas as dependências estão no `pubspec.yaml`
 
-3. **Cobertura não gerada**
-   - Verifique se o arquivo `coverage/lcov.info` existe
-   - Confirme que os testes estão executando corretamente
+2. **Build Android falhando**
+   - Este job é opcional e não quebra o pipeline
+   - Verifique logs para identificar problemas específicos
+   - Pode ser corrigido gradualmente
+
+3. **Build Web falhando**
+   - Verifique configurações do Flutter Web
+   - Confirme que não há dependências específicas de mobile
 
 ### Logs Úteis
 ```bash
@@ -97,4 +106,5 @@ flutter test --verbose
 - [ ] Configurar deploy automático para staging
 - [ ] Adicionar testes de performance
 - [ ] Configurar análise de segurança
-- [ ] Implementar cache de dependências 
+- [ ] Implementar cache de dependências
+- [ ] Corrigir build Android (quando necessário) 
