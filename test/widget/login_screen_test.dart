@@ -13,12 +13,12 @@ void main() {
     });
 
     Widget createLoginScreen() {
-      return MaterialApp(
-        home: LoginScreen(authService: mockAuthService),
-      );
+      return MaterialApp(home: LoginScreen(authService: mockAuthService));
     }
 
-    testWidgets('deve exibir todos os elementos da tela de login', (WidgetTester tester) async {
+    testWidgets('deve exibir todos os elementos da tela de login', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createLoginScreen());
 
       // Verifica se os elementos principais estão presentes
@@ -32,7 +32,9 @@ void main() {
       expect(find.text('Registrar-se'), findsOneWidget);
     });
 
-    testWidgets('deve ter campos de entrada para email e senha', (WidgetTester tester) async {
+    testWidgets('deve ter campos de entrada para email e senha', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createLoginScreen());
 
       // Verifica se os campos de entrada estão presentes
@@ -41,7 +43,9 @@ void main() {
       expect(find.text('Insira sua senha'), findsOneWidget);
     });
 
-    testWidgets('deve mostrar erro para email inválido', (WidgetTester tester) async {
+    testWidgets('deve mostrar erro para email inválido', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createLoginScreen());
 
       // Digita email inválido
@@ -56,11 +60,16 @@ void main() {
       expect(find.text('Por favor, insira um e-mail válido'), findsOneWidget);
     });
 
-    testWidgets('deve mostrar erro para senha muito curta', (WidgetTester tester) async {
+    testWidgets('deve mostrar erro para senha muito curta', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createLoginScreen());
 
       // Digita email válido e senha curta
-      await tester.enterText(find.byType(TextFormField).first, 'teste@email.com');
+      await tester.enterText(
+        find.byType(TextFormField).first,
+        'teste@email.com',
+      );
       await tester.enterText(find.byType(TextFormField).last, '123');
 
       // Tenta submeter o formulário
@@ -68,10 +77,15 @@ void main() {
       await tester.pump();
 
       // Verifica se a mensagem de erro aparece
-      expect(find.text('A senha deve ter pelo menos 6 caracteres'), findsOneWidget);
+      expect(
+        find.text('A senha deve ter pelo menos 6 caracteres'),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('deve mostrar erro para campos vazios', (WidgetTester tester) async {
+    testWidgets('deve mostrar erro para campos vazios', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createLoginScreen());
 
       // Tenta submeter o formulário sem preencher nada
@@ -83,7 +97,9 @@ void main() {
       expect(find.text('Por favor, insira sua senha'), findsOneWidget);
     });
 
-    testWidgets('deve alternar visibilidade da senha', (WidgetTester tester) async {
+    testWidgets('deve alternar visibilidade da senha', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createLoginScreen());
 
       // Verifica se a senha está oculta inicialmente
@@ -104,11 +120,16 @@ void main() {
       expect(find.byIcon(Icons.visibility_outlined), findsOneWidget);
     });
 
-    testWidgets('deve mostrar erro de login com credenciais inválidas', (WidgetTester tester) async {
+    testWidgets('deve mostrar erro de login com credenciais inválidas', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createLoginScreen());
 
       // Digita credenciais inválidas
-      await tester.enterText(find.byType(TextFormField).first, 'teste@email.com');
+      await tester.enterText(
+        find.byType(TextFormField).first,
+        'teste@email.com',
+      );
       await tester.enterText(find.byType(TextFormField).last, 'senhaerrada');
 
       // Submete o formulário
@@ -122,7 +143,9 @@ void main() {
       expect(find.text('E-mail ou senha inválidos.'), findsOneWidget);
     });
 
-    testWidgets('deve navegar para tela de registro', (WidgetTester tester) async {
+    testWidgets('deve navegar para tela de registro', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createLoginScreen());
 
       // Clica no link de registro
@@ -133,7 +156,9 @@ void main() {
       expect(find.text('Criar Conta'), findsOneWidget);
     });
 
-    testWidgets('deve navegar para tela de recuperação de senha', (WidgetTester tester) async {
+    testWidgets('deve navegar para tela de recuperação de senha', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createLoginScreen());
 
       // Clica no link de esqueceu a senha
@@ -144,11 +169,16 @@ void main() {
       expect(find.text('Recuperar Senha'), findsOneWidget);
     });
 
-    testWidgets('deve desabilitar botões durante carregamento', (WidgetTester tester) async {
+    testWidgets('deve desabilitar botões durante carregamento', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createLoginScreen());
 
       // Digita credenciais válidas, mas senha errada para simular loading sem navegação
-      await tester.enterText(find.byType(TextFormField).first, 'teste@email.com');
+      await tester.enterText(
+        find.byType(TextFormField).first,
+        'teste@email.com',
+      );
       await tester.enterText(find.byType(TextFormField).last, 'senhaerrada');
 
       // Submete o formulário
@@ -156,15 +186,19 @@ void main() {
       await tester.pump();
 
       // O botão deve estar em loading
-      final loadingButton = tester.widget<LoadingButton>(find.byType(LoadingButton));
+      final loadingButton = tester.widget<LoadingButton>(
+        find.byType(LoadingButton),
+      );
       expect(loadingButton.isLoading, isTrue);
 
       // Aguarda o término da operação assíncrona
       await tester.pump(const Duration(seconds: 2));
 
       // Após o loading, o botão deve voltar ao normal
-      final loadingButtonAfter = tester.widget<LoadingButton>(find.byType(LoadingButton));
+      final loadingButtonAfter = tester.widget<LoadingButton>(
+        find.byType(LoadingButton),
+      );
       expect(loadingButtonAfter.isLoading, isFalse);
     });
   });
-} 
+}

@@ -20,4 +20,4 @@ import 'widget_test.dart';
 void main() {
   // Este arquivo serve apenas para importar todos os testes
   // Os testes são executados automaticamente quando importados
-} 
+}

@@ -127,7 +127,10 @@ void main() {
         expect(currentUser, isNull);
 
         // Faz login novamente
-        final loggedUser = await authService.login('usuario@email.com', 'teste123');
+        final loggedUser = await authService.login(
+          'usuario@email.com',
+          'teste123',
+        );
         expect(loggedUser, isNotNull);
 
         // Verifica se o usuário está logado novamente
@@ -137,4 +140,4 @@ void main() {
       });
     });
   });
-} 
+}

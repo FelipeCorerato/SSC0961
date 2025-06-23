@@ -11,7 +11,7 @@ class MainScreen extends StatefulWidget {
   final AuthenticationService authService;
 
   const MainScreen({Key? key, required this.user, required this.authService})
-      : super(key: key);
+    : super(key: key);
 
   @override
   State<MainScreen> createState() => _MainScreenState();

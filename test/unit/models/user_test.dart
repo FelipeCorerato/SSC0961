@@ -18,10 +18,7 @@ void main() {
     });
 
     test('deve criar um usuário sem campos opcionais', () {
-      final user = User(
-        id: '123',
-        email: 'teste@email.com',
-      );
+      final user = User(id: '123', email: 'teste@email.com');
 
       expect(user.id, '123');
       expect(user.email, 'teste@email.com');
@@ -62,10 +59,7 @@ void main() {
     });
 
     test('deve converter User sem campos opcionais para JSON', () {
-      final user = User(
-        id: '123',
-        email: 'teste@email.com',
-      );
+      final user = User(id: '123', email: 'teste@email.com');
 
       final json = user.toJson();
 
@@ -75,4 +69,4 @@ void main() {
       expect(json['photoUrl'], null);
     });
   });
-} 
+}
