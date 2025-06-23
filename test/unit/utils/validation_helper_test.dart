@@ -10,7 +10,9 @@ void main() {
       });
 
       test('deve retornar null para email válido com subdomínio', () {
-        final result = ValidationHelper.validateEmail('teste@subdomain.email.com');
+        final result = ValidationHelper.validateEmail(
+          'teste@subdomain.email.com',
+        );
         expect(result, isNull);
       });
 
@@ -77,4 +79,4 @@ void main() {
       });
     });
   });
-} 
+}

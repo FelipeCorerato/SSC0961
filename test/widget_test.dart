@@ -20,12 +20,12 @@ void main() {
     });
 
     Widget createLoginScreen() {
-      return MaterialApp(
-        home: LoginScreen(authService: mockAuthService),
-      );
+      return MaterialApp(home: LoginScreen(authService: mockAuthService));
     }
 
-    testWidgets('App deve carregar com tela de login', (WidgetTester tester) async {
+    testWidgets('App deve carregar com tela de login', (
+      WidgetTester tester,
+    ) async {
       // Build our app and trigger a frame.
       await tester.pumpWidget(createLoginScreen());
 
@@ -35,7 +35,9 @@ void main() {
       expect(find.text('Entrar'), findsOneWidget);
     });
 
-    testWidgets('Deve mostrar campos de email e senha', (WidgetTester tester) async {
+    testWidgets('Deve mostrar campos de email e senha', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createLoginScreen());
 
       // Verifica se os campos de entrada estão presentes
