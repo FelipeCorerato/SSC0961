@@ -14,6 +14,9 @@ import 'unit/services/mock_authentication_service_test.dart';
 // Testes de widgets
 import 'widget/login_screen_test.dart';
 
+// Testes de acessibilidade
+import 'accessibility_test.dart';
+
 // Teste principal do widget
 import 'widget_test.dart';
 
